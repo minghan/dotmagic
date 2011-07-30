@@ -30,6 +30,16 @@ def run():
 
     #pp.pprint(CONFIG)
 
+    lockpath = os.path.join(magicpath, LOCKFILE)
+    lock = lockfile.FileLock(lockpath)
+    
+    # acquire the global lock
+    try:
+        lock.acquire(timeout=5)
+    except lockfile.LockTimeout:
+        sys.stderr.write("dotmagic is currently running. Please try again later.\n")
+        return
+        
     # parse the cmd line args
 
     callee = sys.argv[0]
@@ -61,6 +71,8 @@ def run():
     else:
         usage(callee)
 
+    # now we unlock the filelock
+    lock.release()
     
 def usage(prog):
     print "Usage: %s [fetch|checkout] <param>" % prog
@@ -69,18 +81,6 @@ def usage(prog):
     sys.exit()
 
 def fetch(user):
-    global CONFIG
-
-    lockpath = os.path.join(magicpath, LOCKFILE)
-    lock = lockfile.FileLock(lockpath)
-    
-    # acquire the global lock
-    try:
-        lock.acquire(timeout=5)
-    except lockfile.LockTimeout:
-        sys.stderr.write("dotmagic is currently running. Please try again later.\n")
-        return
-
     # download tar file
     try:
         url = "/".join([CONFIG['repo'], "api", "fetch", user]);
@@ -100,21 +100,9 @@ def fetch(user):
     os.system("tar -xvzf %s -C %s/repo/%s" % (outfile.name, magicpath, user))
     outfile.close()
 
-    # now we unlock the filelock
-    lock.release()
     return
 
 def checkout(user):
-    lockpath = os.path.join(magicpath, LOCKFILE)
-    lock = lockfile.FileLock(lockpath)
-    
-    # acquire the global lock
-    try:
-        lock.acquire(timeout=5)
-    except lockfile.LockTimeout:
-        sys.stderr.write("dotmagic is currently running. Please try again later.\n")
-        return
-
     userpath = os.path.join(magicpath, "repo", user)
     if not os.path.exists(userpath):
         sys.stderr.write("Could not find user %s data. Did you forget to do 'dotmagic fetch %s'?" % (user, user))
@@ -163,13 +151,11 @@ def checkout(user):
     if unrecognized:
         sys.stderr.write("Rcfiles for these programs could not be loaded: %s\n" % " ".join(unrecognized))
 
-    lock.release()
     return
 
 
 def tryuser(user, params):
     rctype = os.path.basename(params[0])
-    global homepath, magicpath
 
     userpath = os.path.join(magicpath, "repo", user)
     if not os.path.exists(userpath) or not rctypes.import_mod(rctype):
@@ -207,7 +193,6 @@ def tryuser(user, params):
             cmd = "mv -f %s %s" % (oldpath, newpath)
             os.system(cmd)
 
-
 def config(params):
     """params is a string list"""
 
@@ -233,6 +218,3 @@ def config(params):
 
 def restore():
     pass
-
-
-
