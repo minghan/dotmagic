@@ -4,6 +4,7 @@ import pprint as pp
 import lockfile
 import urllib2
 import tempfile
+import subprocess
 
 import rctypes
 
@@ -49,8 +50,8 @@ def run():
         checkout(param)
     elif cmd == 'try':
         try:
-            user = sys.argv[1]
-            params = sys.argv[2:]
+            user = sys.argv[2]
+            params = sys.argv[3:]
         except IndexError:
             pass
         else:
@@ -70,19 +71,19 @@ def usage(prog):
 def fetch(user):
     global CONFIG
 
-    lockpath = os.path.join(magicpath, LOCKFILE)
-    lock = lockfile.FileLock(lockpath)
+    #lockpath = os.path.join(magicpath, LOCKFILE)
+    #lock = lockfile.FileLock(lockpath)
     
     # acquire the global lock
-    try:
-        lock.acquire(timeout=5)
-    except lockfile.LockTimeout:
-        sys.stderr.write("dotmagic is currently running. Please try again later.\n")
-        return
+    #try:
+        #lock.acquire(timeout=5)
+    #except lockfile.LockTimeout:
+        #sys.stderr.write("dotmagic is currently running. Please try again later.\n")
+        #return
 
     # download tar file
     try:
-        url = "/".join([CONFIG["REPO"], "api", "fetch", user]);
+        url = "/".join([CONFIG['repo'], "api", "fetch", user]);
         print("Attempting to download from %s..." % url) # TODO: do we need a progress bar?
         infile = urllib2.urlopen(url)
     except urllib2.URLError:
@@ -100,7 +101,7 @@ def fetch(user):
     outfile.close()
 
     # now we unlock the filelock
-    lock.release()
+    #lock.release()
     return
 
 def checkout(user):
@@ -138,7 +139,7 @@ def checkout(user):
             continue
 
         if filename not in types_list: continue
-        mod = sys.modules['rctypes.%' % filename]
+        mod = sys.modules['dotmagic.rctypes.%' % filename]
         whitelist = mod.WHITELIST
 
         for f in whitelist:
@@ -162,35 +163,51 @@ def checkout(user):
     return
 
 
-
 def tryuser(user, params):
     rctype = os.path.basename(params[0])
-    if not os.path.exists(user) or not rctypes.import_mod(rctype):
-        sys.stderr.write("User invalid or rctype unsupported")
+    #print user, params
+    global homepath, magicpath
 
-    mod = sys.modules['rctypes.%' % filename]
+    userpath = os.path.join(magicpath, "repo", user)
+    if not os.path.exists(userpath) or not rctypes.import_mod(rctype):
+        sys.stderr.write("User invalid or rctype unsupported")
+        return
+
+    mod = sys.modules['dotmagic.rctypes.%s' % rctype]
     whitelist = mod.WHITELIST
 
-    global homepath, magicpath
-    os.system("mkdir -p %s", os.path.join(magicpath, 'tmp'))
+    dirpath = os.path.join(magicpath, 'tmp', rctype) # ~/.dotmagic/tmp/vim/
+    os.system("mkdir -p %s" % dirpath)
     for f in whitelist:
         # backup the file to ~/.dotmagic/tmp/rctype/
-        oldpath = os.path.join(homepath, rctype)
-        newpath = os.path.join(magicpath, "tmp", rctype)
-        if os.path.exsist(oldpath):
-            os.system("mv -f %s %s", (oldpath, newpath))
+        oldpath = os.path.join(homepath, f)
+        newpath = os.path.join(magicpath, "tmp", rctype, f)
+        print oldpath
+        if os.path.exists(oldpath):
+            os.system("mv -f %s %s" % (oldpath, newpath))
+
+        # copy in the correct file
+        repopath = os.path.join(magicpath, "repo", user, rctype, f)
+        print repopath
+        if os.path.exists(repopath):
+            os.system("cp -rf %s %s" % (repopath, oldpath))
 
     # run the prog
     p = subprocess.Popen(params)
     p.wait() # block
 
+    print "-------"
+
     # restore the files
     for f in whitelist:
-        newpath = os.path.join(homepath, rctype)
-        oldpath = os.path.join(magicpath, "tmp", rctype)
-        if os.path.exsist(oldpath):
-            os.system("mv -f %s %s", (oldpath, newpath))
-
+        newpath = os.path.join(homepath, f)
+        oldpath = os.path.join(magicpath, "tmp", rctype, f)
+        print newpath
+        print oldpath
+        if os.path.exists(oldpath):
+            cmd = "mv -f %s %s" % (oldpath, newpath)
+            print cmd
+            os.system(cmd)
 
 
 def config(params):
