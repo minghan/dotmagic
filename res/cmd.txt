@@ -1,0 +1,33 @@
+
+
++ cmds
+
+
+~/.dotmagic.yaml
+
+
+http://dotmagic/api/pull/<user>
+
+-> django view script
+-> looks at a local dir listing? 
+-> return tar.gz
+
+tar.gz
+- meta.yaml
+- vim/.vimrc
+- vim/.vim/
+- emacs/
+- screen/
+
+
+dotmagic repo <repo_path>
+
+dotmagic pull <user>
+
+dotmagic checkout <user>
+
+dotmagic try <user> vim
+
+
+
+
