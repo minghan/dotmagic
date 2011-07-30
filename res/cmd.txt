@@ -22,9 +22,19 @@ tar.gz
 
 dotmagic repo <repo_path>
 
-dotmagic pull <user>
+dotmagic fetch <user>
+
+- download to /tmp dir?
+- untar to ~/.dotmagic/repo/<user>
+
+lockfile: ~/.dotmagic/GLOBAL.LOCK
 
 dotmagic checkout <user>
+
+dotmagic restore
+
+- restore from ~/.dotmagic/backup/
+
 
 dotmagic try <user> vim
 
