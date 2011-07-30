@@ -69,15 +69,17 @@ def usage(prog):
     sys.exit()
 
 def fetch(user):
-    #lockpath = os.path.join(magicpath, LOCKFILE)
-    #lock = lockfile.FileLock(lockpath)
+    global CONFIG
+
+    lockpath = os.path.join(magicpath, LOCKFILE)
+    lock = lockfile.FileLock(lockpath)
     
     # acquire the global lock
-    #try:
-        #lock.acquire(timeout=5)
-    #except lockfile.LockTimeout:
-        #sys.stderr.write("dotmagic is currently running. Please try again later.\n")
-        #return
+    try:
+        lock.acquire(timeout=5)
+    except lockfile.LockTimeout:
+        sys.stderr.write("dotmagic is currently running. Please try again later.\n")
+        return
 
     # download tar file
     try:
@@ -99,7 +101,7 @@ def fetch(user):
     outfile.close()
 
     # now we unlock the filelock
-    #lock.release()
+    lock.release()
     return
 
 def checkout(user):
@@ -167,7 +169,6 @@ def checkout(user):
 
 def tryuser(user, params):
     rctype = os.path.basename(params[0])
-    #print user, params
     global homepath, magicpath
 
     userpath = os.path.join(magicpath, "repo", user)
@@ -184,13 +185,12 @@ def tryuser(user, params):
         # backup the file to ~/.dotmagic/tmp/rctype/
         oldpath = os.path.join(homepath, f)
         newpath = os.path.join(magicpath, "tmp", rctype, f)
-        print oldpath
         if os.path.exists(oldpath):
-            os.system("mv -f %s %s" % (oldpath, newpath))
+            cmd = "mv -f %s %s" % (oldpath, newpath)
+            os.system(cmd)
 
         # copy in the correct file
         repopath = os.path.join(magicpath, "repo", user, rctype, f)
-        print repopath
         if os.path.exists(repopath):
             os.system("cp -rf %s %s" % (repopath, oldpath))
 
@@ -198,17 +198,13 @@ def tryuser(user, params):
     p = subprocess.Popen(params)
     p.wait() # block
 
-    print "-------"
-
     # restore the files
     for f in whitelist:
         newpath = os.path.join(homepath, f)
         oldpath = os.path.join(magicpath, "tmp", rctype, f)
-        print newpath
-        print oldpath
         if os.path.exists(oldpath):
+            os.system("rm -rf %s" % newpath)
             cmd = "mv -f %s %s" % (oldpath, newpath)
-            print cmd
             os.system(cmd)
 
 
