@@ -1,1 +1,1 @@
-WHITELIST = 
+WHITELIST = [] # 
