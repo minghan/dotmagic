@@ -5,6 +5,8 @@ import lockfile
 import urllib2
 import tempfile
 
+import rctypes
+
 FILENAME = ".dotmagic.yaml"
 LOCKFILE = "GLOBAL.LOCK"
 
@@ -28,29 +30,45 @@ def run():
     CONFIG = doc
     f.close()
 
-    pp.pprint(CONFIG)
-
+    #pp.pprint(CONFIG)
 
     # parse the cmd line args
 
+    callee = sys.argv[0]
+
     try:
         cmd = sys.argv[1]
-        if cmd != "restore":
+        if cmd == 'fetch' or cmd == 'checkout':
             param = sys.argv[2]
     except IndexError:
-        print "Usage: %s [fetch|checkout|try] [param]\n       %s [restore]" % (sys.argv[0], sys.argv[0])
-        sys.exit()
-    
-    if cmd == 'repo':
-        pass
+        usage(callee)
+
+
+    if cmd == 'restore':
+        restore()
     elif cmd == 'fetch':
         fetch(param)
     elif cmd == 'checkout':
         checkout(param)
     elif cmd == 'try':
+        try:
+            user = sys.argv[1]
+            params = sys.argv[2:]
+        except IndexError:
+            pass
+        else:
+            tryuser(user, params)
+    elif cmd == 'config':
         pass
+    else:
+        usage(callee)
 
     
+def usage(prog):
+    print "Usage: %s [fetch|checkout] <param>" % prog
+    print "       %s [try] <user> <program>" % prog
+    print "       %s [restore]" % prog
+    sys.exit()
 
 def fetch(user):
     global CONFIG
@@ -115,21 +133,16 @@ def checkout(user):
     filelist = os.listdir(userpath)
     print("Files in userpath: %s" % filelist)
     unrecognized = []
+
+    types_list = rctypes.import_all()
+
     for filename in filelist:
         if filename == "meta.yaml":
             continue
 
-        # assume we have the whitelist
-        #if filename in globals():
-        #    whitelist = globals()[filename].WHITELIST
-        #else:
-        #    unrecognized.append(filename)
-        #    continue
-
-        if filename != "vim":
-            continue
-
-        whitelist = [".vimrc", ".vim"]
+        if filename not in types_list: continue
+        mod = sys.modules['rctypes.%' % filename]
+        whitelist = mod.WHITELIST
 
         for f in whitelist:
             fulluserpath = os.path.join(userpath, f)
@@ -150,3 +163,44 @@ def checkout(user):
 
     lock.release()
     return
+
+
+
+def tryuser(user, params):
+    rctype = os.path.basename(params[0])
+    if not os.path.exists(user) or not rctypes.import_mod(rctype)
+        sys.stderr.write("User invalid or rctype unsupported")
+
+    mod = sys.modules['rctypes.%' % filename]
+    whitelist = mod.WHITELIST
+
+    global homepath, magicpath
+    os.system("mkdir -p %s", os.path.join(magicpath, 'tmp'))
+    for f in whitelist:
+        # backup the file to ~/.dotmagic/tmp/rctype/
+        oldpath = os.path.join(homepath, rctype)
+        newpath = os.path.join(magicpath, "tmp", rctype)
+        if os.path.exsist(oldpath):
+            os.system("mv -f %s %s", (oldpath, newpath))
+
+    # run the prog
+    p = subprocess.Popen(params)
+    p.wait() # block
+
+    # restore the files
+    for f in whitelist:
+        newpath = os.path.join(homepath, rctype)
+        oldpath = os.path.join(magicpath, "tmp", rctype)
+        if os.path.exsist(oldpath):
+            os.system("mv -f %s %s", (oldpath, newpath))
+
+
+
+def config():
+    pass
+
+
+
+
+def restore():
+

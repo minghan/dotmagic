@@ -38,6 +38,8 @@ dotmagic restore
 
 dotmagic try <user> vim
 
+- backup stuff to ~/.dotmagic/tmp/
+
 
 
 
