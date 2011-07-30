@@ -69,8 +69,6 @@ def usage(prog):
     sys.exit()
 
 def fetch(user):
-    global CONFIG
-
     #lockpath = os.path.join(magicpath, LOCKFILE)
     #lock = lockfile.FileLock(lockpath)
     
@@ -129,7 +127,6 @@ def checkout(user):
         os.system("mkdir -p %s" % backuppath)
 
     filelist = os.listdir(userpath)
-    print("Files in userpath: %s" % filelist)
     unrecognized = []
 
     types_list = rctypes.import_all()
@@ -139,22 +136,27 @@ def checkout(user):
             continue
 
         if filename not in types_list: continue
-        mod = sys.modules['dotmagic.rctypes.%' % filename]
+        mod = sys.modules['dotmagic.rctypes.%s' % filename]
         whitelist = mod.WHITELIST
 
         for f in whitelist:
-            fulluserpath = os.path.join(userpath, f)
+            fulluserpath = os.path.join(userpath, filename, f)
             fullhomepath = os.path.join(homepath, f)
+            fullbackuppath = os.path.join(backuppath, f)
+            print("Check if %s exist" % fulluserpath)
             if os.path.exists(fulluserpath):
+                print("%s exists!" % fulluserpath)
                 if os.path.isdir(fulluserpath):
                     cmd = "cp -R %s %s"
                 else:
                     cmd = "cp %s %s"
 
                 if need_backup:
-                    os.system(cmd % (fullhomepath, backuppath))
+                    print("Running %s" % (cmd % (fullhomepath, fullbackuppath)))
+                    os.system(cmd % (fullhomepath, fullbackuppath))
 
-                os.system(cmd % (fulluserpath, fullhomepath))
+                print("Running %s" % (cmd % (fulluserpath, homepath)))
+                os.system(cmd % (fulluserpath, homepath))
 
     if unrecognized:
         sys.stderr.write("Rcfiles for these programs could not be loaded: %s\n" % " ".join(unrecognized))
