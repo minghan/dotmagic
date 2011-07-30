@@ -108,13 +108,7 @@ def checkout(user):
         sys.stderr.write("Could not find user %s data. Did you forget to do 'dotmagic fetch %s'?" % (user, user))
         return
 
-    # check if we need to backup the data first
-    # if backup directory already exists, then we do not need to :)
     backuppath = os.path.join(magicpath, "backup")
-    need_backup = not os.path.exists(backuppath)
-
-    if need_backup:
-        os.system("mkdir -p %s" % backuppath)
 
     filelist = os.listdir(userpath)
     unrecognized = []
@@ -129,10 +123,16 @@ def checkout(user):
         mod = sys.modules['dotmagic.rctypes.%s' % filename]
         whitelist = mod.WHITELIST
 
+        # check if we need to backup this path
+        fullbackuppath = os.path.join(backuppath, filename)
+        need_backup = not os.path.exists(fullbackuppath)
+        if need_backup:
+            print("Creating backup: mkdir -p %s" % fullbackuppath)
+            os.system("mkdir -p %s" % fullbackuppath)
+
         for f in whitelist:
             fulluserpath = os.path.join(userpath, filename, f)
             fullhomepath = os.path.join(homepath, f)
-            fullbackuppath = os.path.join(backuppath, f)
             print("Check if %s exist" % fulluserpath)
             if os.path.exists(fulluserpath):
                 print("%s exists!" % fulluserpath)
