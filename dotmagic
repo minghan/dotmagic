@@ -1,0 +1,14 @@
+#!/usr/bin/env python
+
+import os, sys
+
+libdir = "/Users/minghan/Documents/hanworks/" # base dir
+
+if libdir not in sys.path:
+    sys.path.insert(0, libdir)
+
+import dotmagic.dispatch
+
+dotmagic.dispatch.run()
+
+
