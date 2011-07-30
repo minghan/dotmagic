@@ -13,21 +13,18 @@ LOCKFILE = "GLOBAL.LOCK"
 CONFIG = {}
 homepath = os.getenv('HOME')
 magicpath = os.path.join(homepath, ".dotmagic")
+configpath = os.path.join(homepath, FILENAME) 
 
 def run():
-    global CONFIG
 
     # read .dotmagic.yaml
     # load the yaml file
 
     env_map = {}
 
-    path = os.path.join(homepath, FILENAME) 
-
-    f = open(path)
-    # use yaml.load(f) to load a single document
-    doc = yaml.load(f)
-    CONFIG = doc
+    global CONFIG
+    f = open(configpath)
+    CONFIG = yaml.load(f)
     f.close()
 
     #pp.pprint(CONFIG)
@@ -59,7 +56,7 @@ def run():
         else:
             tryuser(user, params)
     elif cmd == 'config':
-        pass
+        config(sys.argv[2:])
     else:
         usage(callee)
 
@@ -168,7 +165,7 @@ def checkout(user):
 
 def tryuser(user, params):
     rctype = os.path.basename(params[0])
-    if not os.path.exists(user) or not rctypes.import_mod(rctype)
+    if not os.path.exists(user) or not rctypes.import_mod(rctype):
         sys.stderr.write("User invalid or rctype unsupported")
 
     mod = sys.modules['rctypes.%' % filename]
@@ -196,11 +193,31 @@ def tryuser(user, params):
 
 
 
-def config():
+def config(params):
+    """params is a string list"""
+
+    import getopt
+    
+    # yaml file alr read... CONFIG var
+
+    # getopt
+
+    optlist, args = getopt.getopt(params, "", ['repo='])
+    print optlist, args
+
+    for (key, value) in optlist: # key comes with -- prefix
+        key = key[2:]
+        CONFIG[key] = value
+        
+    # writes back the yaml
+    stream = file(configpath, 'w')
+    yaml.dump(CONFIG, stream)
+    stream.close()
+
+    return
+
+def restore():
     pass
 
 
-
-
-def restore():
 
