@@ -77,7 +77,7 @@ def run():
 def usage(prog):
     print "Usage: %s [fetch|checkout] <param>" % prog
     print "       %s [try] <user> <program>" % prog
-    print "       %s [restore]" % prog
+    #print "       %s [restore]" % prog
     return
 
 def fetch(user):
