@@ -1,5 +1,16 @@
 #!/usr/bin/env python
 
+
+"""
+Two ways to put in bin
+
+- copy this file into bin and change libdir below
+OR
+- Use a symlink
+  ln -s /this/file/path /bin/path/dotmagic
+
+"""
+
 import os, sys
 
 libdir = "/Users/minghan/Documents/hanworks/" # base dir
