@@ -6,7 +6,7 @@
 ~/.dotmagic.yaml
 
 
-http://dotmagic/api/pull/<user>
+http://dotmagic/api/fetch/<user>
 
 -> django view script
 -> looks at a local dir listing? 
