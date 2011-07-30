@@ -78,7 +78,7 @@ def usage(prog):
     print "Usage: %s [fetch|checkout] <param>" % prog
     print "       %s [try] <user> <program>" % prog
     print "       %s [restore]" % prog
-    sys.exit()
+    return
 
 def fetch(user):
     # download tar file
@@ -217,4 +217,27 @@ def config(params):
     return
 
 def restore():
-    pass
+    return
+    """
+    backuppath = os.path.join(magicpath, "backup")
+    filelist = os.listdir(backuppath)
+
+    types_list = rctypes.import_mod(filelist)
+
+    # look thru each folder in the backup dir
+    # then use whitelist to retrieve list of valid files
+    for filename in filelist:
+        if filename == "meta.yaml": continue
+        if not os.path.isdir(filename): continue
+
+        rctype = filename
+        mod = sys.modules['dotmagic.rctypes.%s' % filename]
+        whitelist = mod.WHITELIST
+
+        for f in whitelist:
+            fullpath = os.join.path(magicpath, 'backup', rctype ,f)
+            if os.path.exists(fullpath):
+                
+
+    # remove the backup folder?
+    """
