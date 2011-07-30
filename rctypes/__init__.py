@@ -6,7 +6,7 @@ packpath = os.path.dirname(__file__)
 
 def import_mod(modname):
 
-    modname = modname.lower()
+    modname = str(modname).lower()
 
     path = os.path.join(packpath, modname + ".py")
     if os.path.isfile(path):

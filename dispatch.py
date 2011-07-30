@@ -30,15 +30,15 @@ def run():
 
     #pp.pprint(CONFIG)
 
-    lockpath = os.path.join(magicpath, LOCKFILE)
-    lock = lockfile.FileLock(lockpath)
+    #lockpath = os.path.join(magicpath, LOCKFILE)
+    #lock = lockfile.FileLock(lockpath)
     
     # acquire the global lock
-    try:
-        lock.acquire(timeout=5)
-    except lockfile.LockTimeout:
-        sys.stderr.write("dotmagic is currently running. Please try again later.\n")
-        return
+    #try:
+        #lock.acquire(timeout=5)
+    #except lockfile.LockTimeout:
+        #sys.stderr.write("dotmagic is currently running. Please try again later.\n")
+        #return
         
     # parse the cmd line args
 
@@ -72,12 +72,12 @@ def run():
         usage(callee)
 
     # now we unlock the filelock
-    lock.release()
+    #lock.release()
     
 def usage(prog):
     print "Usage: %s [fetch|checkout] <param>" % prog
     print "       %s [try] <user> <program>" % prog
-    #print "       %s [restore]" % prog
+    print "       %s [restore]" % prog
     return
 
 def fetch(user):
@@ -203,7 +203,7 @@ def config(params):
     # getopt
 
     optlist, args = getopt.getopt(params, "", ['repo='])
-    print optlist, args
+    #print optlist, args
 
     for (key, value) in optlist: # key comes with -- prefix
         key = key[2:]
@@ -217,27 +217,30 @@ def config(params):
     return
 
 def restore():
-    return
-    """
     backuppath = os.path.join(magicpath, "backup")
     filelist = os.listdir(backuppath)
 
-    types_list = rctypes.import_mod(filelist)
 
     # look thru each folder in the backup dir
     # then use whitelist to retrieve list of valid files
     for filename in filelist:
         if filename == "meta.yaml": continue
-        if not os.path.isdir(filename): continue
+
+        types_list = rctypes.import_mod(filename)
 
         rctype = filename
         mod = sys.modules['dotmagic.rctypes.%s' % filename]
         whitelist = mod.WHITELIST
 
         for f in whitelist:
-            fullpath = os.join.path(magicpath, 'backup', rctype ,f)
+            fullpath = os.path.join(magicpath, 'backup', rctype ,f)
+            actpath = os.path.join(homepath, f)
             if os.path.exists(fullpath):
-                
+                if os.path.exists(actpath):
+                    os.system("rm -rf %s" % actpath)
+                os.system("cp -r %s %s" % (fullpath, actpath))
+        os.system("rm -rf %s" % os.path.join(magicpath, 'backup', rctype))
 
-    # remove the backup folder?
-    """
+    return
+
+
