@@ -14,41 +14,41 @@ Synopsis
 Actions
 -------
 
-* init
+* ``init``
 
     Initialize the state of the application by creating the ~/.dotmagic folder
     Asks you a few questions to get started.
     Questions include username and rctypes whitelist.
 
-* config
+* ``config``
 
-* fetch <username>
+* ``fetch <username>``
 
-    <username> is optional. Uses the current username unless specified.
+    ``<username>`` is optional. Uses the current username unless specified.
     Downloads all snapshots into the repo.
 
-* checkout <username> <version>
+* ``checkout <username> <version>``
 
     Does a cleanup, followed by a copy and paste of the current version in the repo.
 
-* backup
+* ``backup``
 
-    Saves a snapshot in the ~/.dotmagic/repo/<username>/ directory
+    Saves a snapshot in the ``~/.dotmagic/repo/<username>/`` directory
 
-* push
+* ``push``
 
     Uploads all snapshots to the server.
 
-* pull
+* ``pull``
 
     Combination of fetch and checkout.
 
-* try <username> <appname> <cmd>
+* ``try <username> <appname> <cmd>``
 
-    Backup configuration for the program to ~/.dotmagic/tmp/
+    Backup configuration for the program to ``~/.dotmagic/tmp/``
     and starts the application.
 
-* cleanup
+* ``cleanup``
 
     Removes all available config files based on preferences.
 
@@ -59,15 +59,15 @@ Architecture
 Static Layout
 -------------
 
-* rctypes
+* ``rctypes``
 
     Contains the available configuration types
 
-* ~/.dotmagic/dotmagic.yaml
+* ``~/.dotmagic/dotmagic.yaml``
 
-* ~/.dotmagic/tmp/<appname>/
+* ``~/.dotmagic/tmp/<appname>/``
 
-* ~/.dotmagic/repo/<username>/
+* ``~/.dotmagic/repo/<username>/``
 
 
 
