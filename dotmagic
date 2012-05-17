@@ -18,8 +18,9 @@ libdir = "/Users/minghan/Documents/hanworks/" # base dir
 if libdir not in sys.path:
     sys.path.insert(0, libdir)
 
-import dotmagic.dispatch
+#import dotmagic.dispatch
+import dispatch
 
-dotmagic.dispatch.run()
+dispatch.run()
 
 

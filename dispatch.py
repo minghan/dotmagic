@@ -1,23 +1,52 @@
+# Copyright (c) 2011-2012 Ming Han Teh
+
 import sys, os
-import yaml
 import pprint as pp
-import lockfile
 import urllib2
 import tempfile
 import subprocess
 
 import rctypes
+from lib import cmdln
 
+#import lockfile
+
+HOMEPATH = os.getenv('HOME')                        # folder
+CONFIGPATH = os.path.join(HOMEPATH, ".dotmagic")    # folder
+CONFIGFILEPATH = os.path.join(CONFIGPATH, "config")
+
+class Dotmagic(cmdln.Cmdln):
+    name = "dotmagic"
+
+    def do_init(self, subcmd, opts, *paths):
+        """${cmd_name}: Initializes the local repository and settigs"""
+
+        if not os.path.exists(CONFIGPATH):
+            os.makedirs(CONFIGPATH)
+
+        if not os.path.exists(CONFIGFILEPATH):
+            f = open(CONFIGFILEPATH, "w")
+            f.write("hello\n")
+            f.close()
+
+
+'''
 FILENAME = ".dotmagic.yaml"
 LOCKFILE = "GLOBAL.LOCK"
 
 CONFIG = {}
-homepath = os.getenv('HOME')
 magicpath = os.path.join(homepath, ".dotmagic")
-configpath = os.path.join(homepath, FILENAME) 
+'''
+
+
+
 
 def run():
 
+    dm = Dotmagic()
+    sys.exit(dm.main())
+
+    '''
     # read .dotmagic.yaml
     # load the yaml file
 
@@ -73,7 +102,10 @@ def run():
 
     # now we unlock the filelock
     #lock.release()
-    
+    '''
+
+
+'''
 def usage(prog):
     print "Usage: %s [fetch|checkout] <param>" % prog
     print "       %s [try] <user> <program>" % prog
@@ -243,4 +275,4 @@ def restore():
 
     return
 
-
+'''
