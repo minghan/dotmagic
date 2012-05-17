@@ -6,28 +6,76 @@ import urllib2
 import tempfile
 import subprocess
 
-import rctypes
 from lib import cmdln
+import app
+import config
 
+#import rctypes
 #import lockfile
 
-HOMEPATH = os.getenv('HOME')                        # folder
-CONFIGPATH = os.path.join(HOMEPATH, ".dotmagic")    # folder
-CONFIGFILEPATH = os.path.join(CONFIGPATH, "config")
+# http://code.google.com/p/cmdln/wiki/GettingStarted
 
 class Dotmagic(cmdln.Cmdln):
     name = "dotmagic"
 
-    def do_init(self, subcmd, opts, *paths):
-        """${cmd_name}: Initializes the local repository and settigs"""
+    def __init__(self):
+        cmdln.Cmdln.__init__(self)
+        
+        if not os.path.exists(app.CONFIG_FILEPATH):
+            self.config_dict = config.default()
+        else:
+            self.config_dict = config.read(app.CONFIG_FILEPATH)
 
-        if not os.path.exists(CONFIGPATH):
-            os.makedirs(CONFIGPATH)
+    def do_init(self, subcmd, opts):
+        """${cmd_name}: Initializes the local repository and settings
+        
+        ${cmd_usage}
+        """
 
-        if not os.path.exists(CONFIGFILEPATH):
-            f = open(CONFIGFILEPATH, "w")
-            f.write("hello\n")
-            f.close()
+        if not os.path.exists(app.CONFIG_FOLDER):
+            os.makedirs(app.CONFIG_FOLDER)
+
+        if not os.path.exists(app.CONFIG_FILEPATH):
+
+            username = self.config_dict['core']['username']
+            while username == '':
+                sys.stdout.write("Enter your prefered username: ")
+                username = sys.stdin.readline().strip()
+                if username == '': print "username cannot be empty"
+            self.config_dict['core']['username'] = username
+
+            config.write(app.CONFIG_FILEPATH, self.config_dict)
+
+            print "Settings initialized for <%s>" % username 
+
+    def do_checkout(self, subcmd, opts, *paths):
+        """${cmd_name}: Checks out the current version of settings in the local repository
+        
+        ${cmd_usage}
+        """
+        pass
+
+    def do_add(self, subcmd, opts, apps):
+        """${cmd_name}: Adds comma-separated list of apps to the tracker
+        
+        ${cmd_usage}
+        """
+        for a in apps.split(","):
+            self.config_dict['apps']['whitelist'].add(a)
+        config.write(app.CONFIG_FILEPATH, self.config_dict)
+
+    def do_remove(self, subcmd, opts, apps):
+        """${cmd_name}: Removes comma-separated list of apps to the tracker
+        
+        ${cmd_usage}
+        """
+        for a in apps.split(","):
+            self.config_dict['apps']['whitelist'].discard(a)
+        config.write(app.CONFIG_FILEPATH, self.config_dict)
+
+    def do_try(self, subcmd, opts, *paths):
+        pass
+
 
 
 '''

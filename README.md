@@ -52,11 +52,11 @@ Actions
 
     Removes all available config files based on preferences.
 
-*  ``add <appname>``
+*  ``add <appns>``
     
     Track the config files for that app.
 
-*  ``remove <appname>`` -r
+*  ``remove <apps> -r``
 
     Untracks the config files for that app.
 
@@ -74,18 +74,19 @@ Actions
 Architecture
 ============
 
-Static Layout
--------------
+Static layout of ``~/.dotmagic/``
+--------------------------------
 
-* ``rctypes``
+* ``~/.dotmagic/config``
+
+* ``~/.dotmagic/apps/``
 
     Contains the available configuration types
 
-* ``~/.dotmagic/dotmagic.yaml``
+* ``~/.dotmagic/repo/<username>/index``
 
-* ``~/.dotmagic/tmp/<appname>/``
+* ``~/.dotmagic/repo/<username>/<sha>/``
 
-* ``~/.dotmagic/repo/<username>/``
-
+* ``~/.dotmagic/tmp/<app>/``
 
 
