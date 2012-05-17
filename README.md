@@ -52,6 +52,24 @@ Actions
 
     Removes all available config files based on preferences.
 
+*  ``add <appname>``
+    
+    Track the config files for that app.
+
+*  ``remove <appname>`` -r
+
+    Untracks the config files for that app.
+
+    -r removes the files as well.
+
+*  ``update-rctypes``
+    
+    Updates supported rctypes by syncing with the server.
+
+*   ``help``
+
+    Displays the help.
+
 
 Architecture
 ============
