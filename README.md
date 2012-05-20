@@ -62,9 +62,9 @@ Actions
 
     -r removes the files as well.
 
-*  ``update-rctypes``
+*  ``update``
     
-    Updates supported rctypes by syncing with the server.
+    Updates supported apps by downloading from the server.
 
 *   ``help``
 

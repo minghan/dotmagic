@@ -5,6 +5,7 @@ import pprint as pp
 import urllib2
 import tempfile
 import subprocess
+import tarfile
 
 from lib import cmdln
 import app
@@ -74,9 +75,69 @@ class Dotmagic(cmdln.Cmdln):
         config.write(app.CONFIG_FILEPATH, self.config_dict)
 
     def do_try(self, subcmd, opts, *paths):
+        """${cmd_name}: Try different config
+        
+        ${cmd_usage}
+        """
         pass
 
+    def do_backup(self, subcmd, opts, *paths):
+        """${cmd_name}: Save into local repo
+        
+        ${cmd_usage}
+        """
+        pass
 
+    def do_config(self, subcmd, opts, *paths):
+        """${cmd_name}: Show config options
+        
+        ${cmd_usage}
+        """
+
+        print "username: %s" % self.config_dict['core']['username']
+        print "tracking the following apps:"
+        for a in self.config_dict['apps']['whitelist']:
+            print " %s" % a
+        
+    def do_update(self, subcmd, opts):
+        """${cmd_name}: Update apps list
+        
+        ${cmd_usage}
+        """
+        try:
+            url = "/".join([self.config_dict['core']['url'], 'api', 'getapps'])
+            print "Downloading from %s" % url
+            infile = urllib2.urlopen(url)
+        except urllib2.URLError:
+            sys.stderr.write("Error downloading from %s" % url)
+            return
+
+        apps_folder = os.path.join(app.CONFIG_FOLDER, 'apps')
+        def check_apps_folder():
+            # create the output directory, empty it, then untar into it
+            if not os.path.exists(apps_folder):
+                os.makedirs(apps_folder)
+            else:
+                pass # XXX: should we clean the directory?
+
+        CHUNK = 16 * 1024
+        with tempfile.TemporaryFile() as outfile:
+            while True:
+                buf = infile.read(CHUNK)
+                if buf == '':
+                    break
+                outfile.write(buf)
+            outfile.flush()
+            outfile.seek(0)
+
+            check_apps_folder()
+            
+            tf = tarfile.open(fileobj=outfile, mode='r:gz')
+            for item in tf:
+                tf.extract(item, path=apps_folder)
+            tf.close()
+
+        print "Apps update successful."
 
 '''
 FILENAME = ".dotmagic.yaml"
@@ -85,8 +146,6 @@ LOCKFILE = "GLOBAL.LOCK"
 CONFIG = {}
 magicpath = os.path.join(homepath, ".dotmagic")
 '''
-
-
 
 
 def run():

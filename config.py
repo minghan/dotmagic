@@ -50,7 +50,7 @@ def default():
         'core': {
             'username':  '',
             'version': int(app.VERSION),
-            'url': ''
+            'url': 'http://127.0.0.1'
         },
         'apps': {
             'whitelist': set()
