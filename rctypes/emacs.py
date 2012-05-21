@@ -1,1 +1,0 @@
-WHITELIST = ['.emacs', '.emacs.d']
